@@ -1,6 +1,6 @@
 import { Redis } from 'ioredis';
-import { FixedWindowLimiter } from './FixedWindowLimiter';
-import AbstractRateLimiter from './AbstractRateLimiter';
+import FixedWindowLimiter from './rate-limiter/FixedWindowLimiter';
+import AbstractRateLimiter from './rate-limiter/AbstractRateLimiter';
 
 export enum RateLimiterType {
     FixedWindow = 'FIXED_WINDOW',
@@ -8,23 +8,26 @@ export enum RateLimiterType {
 }
 
 export interface RateLimiterOptions {
-    window: number;
+    windowInSeconds: number;
     maxRequests: number;
     redisClient: Redis;
+}
+
+export interface RateLimiterOptionsWithTypes extends RateLimiterOptions {
     type: RateLimiterType;
 }
 
 export default class RateLimiter {
     private limiter: AbstractRateLimiter;
 
-    constructor(options: RateLimiterOptions) {
-        const { redisClient, window, maxRequests, type } = options;
+    constructor(options: RateLimiterOptionsWithTypes) {
+        const { redisClient, windowInSeconds, maxRequests, type } = options;
 
         switch (type) {
             case RateLimiterType.FixedWindow:
-                this.limiter = new FixedWindowLimiter(redisClient, window, maxRequests);
+                this.limiter = new FixedWindowLimiter({ redisClient, windowInSeconds, maxRequests });
                 break;
-            // Uncomment and implement this when adding the sliding window limiter
+
             // case RateLimiterType.SlidingWindow:
             //     this.limiter = new SlidingWindowLimiter(redisClient, windowInSeconds, limit);
             //     break;
