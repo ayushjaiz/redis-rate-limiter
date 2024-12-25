@@ -1,10 +1,17 @@
 import { Request } from "express";
-import { getClientIp } from "../utils/getClientIp";
+
+const getClientIp = (req: Request): string => {
+    return (
+        (req.headers["x-forwarded-for"] as string) ||
+        req.socket.remoteAddress ||
+        ""
+    )
+        .split(",")[0]
+        .trim();
+};
 
 /**
  * Generates a unique key for rate limiting based on IP and URL.
- * @param req - Express request object.
- * @returns The generated key as a string.
  */
 export const generateRateLimiterKey = (req: Request): string => {
     const ip = getClientIp(req);

@@ -1,10 +1,10 @@
-import { Redis } from 'ioredis';
-import FixedWindowLimiter from './rate-limiter/FixedWindowLimiter';
-import AbstractRateLimiter from './rate-limiter/AbstractRateLimiter';
+import { Redis } from "ioredis";
+import FixedWindowLimiter from "./rate-limiter/FixedWindowLimiter";
+import AbstractRateLimiter from "./rate-limiter/AbstractRateLimiter";
 
 export enum RateLimiterType {
-    FixedWindow = 'FIXED_WINDOW',
-    SlidingWindow = 'SLIDING_WINDOW',
+    FixedWindow = "FIXED_WINDOW",
+    SlidingWindow = "SLIDING_WINDOW",
 }
 
 export interface RateLimiterOptions {
@@ -25,14 +25,22 @@ export default class RateLimiter {
 
         switch (type) {
             case RateLimiterType.FixedWindow:
-                this.limiter = new FixedWindowLimiter({ redisClient, windowInSeconds, maxRequests });
+                this.limiter = new FixedWindowLimiter({
+                    redisClient,
+                    windowInSeconds,
+                    maxRequests,
+                });
                 break;
 
             // case RateLimiterType.SlidingWindow:
             //     this.limiter = new SlidingWindowLimiter(redisClient, windowInSeconds, limit);
             //     break;
             default:
-                throw new Error(`Unsupported rate limiter type: ${type}. Supported types are: ${Object.values(RateLimiterType).join(', ')}`);
+                throw new Error(
+                    `Unsupported rate limiter type: ${type}. Supported types are: ${Object.values(
+                        RateLimiterType
+                    ).join(", ")}`
+                );
         }
     }
 

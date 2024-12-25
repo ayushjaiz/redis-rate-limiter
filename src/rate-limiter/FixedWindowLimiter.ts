@@ -9,12 +9,8 @@ class FixedWindowLimiter extends AbstractRateLimiter {
     async validate(key: string): Promise<boolean> {
         const requestCount = await this.redisClient.incr(key);
 
-        let ttl: number;
         if (requestCount === 1) {
             await this.redisClient.expire(key, this.windowInSeconds);
-            ttl = this.windowInSeconds;
-        } else {
-            ttl = await this.redisClient.ttl(key);
         }
 
         return requestCount <= this.maxRequests;
